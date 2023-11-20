@@ -1,0 +1,90 @@
+INFO:__main__:Starting Flask server
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+INFO:__main__:Starting Flask server
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 728-232-698
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[33mGET / HTTP/1.1[0m" 404 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[33mGET / HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[33mGET / HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+INFO:__main__:Fetching data
+INFO:__main__:Fetching data
+INFO:__main__:Fetching data
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:26] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:31] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:32] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:37] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:42] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:47] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+ERROR:__main__:No data available
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:52] "[35m[1mGET /get_data HTTP/1.1[0m" 503 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:34:57] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:02] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:03] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:04] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:08] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:13] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:18] "GET /get_data HTTP/1.1" 200 -
+INFO:__main__:Starting Flask server
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+INFO:__main__:Fetching data
+INFO:__main__:Returning data: Temp=23.8, Hum=39
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2023 16:35:55] "GET /get_data HTTP/1.1" 200 -

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>Fire Map</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    #map {
+      height: calc(100vh - 20px) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" style="height: 500px;"></div>
+
+  <script>
+    var world_street_map = L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    });
+
+    // Initialize the map
+    var map = L.map('map', {
+      layers: [world_street_map] // Default basemap
+    }).setView([53.381557878700825, -1.482525744182223], 15);
+
+    // Add a marker to the map
+    var marker = L.marker([53.381557878700825, -1.482525744182223]).addTo(map);
+
+    // Function to update marker description
+    function updateMarkerDescription(temp, hum) {
+      marker.bindPopup('Temperature: ' + temp + ' °C<br>Humidity: ' + hum + ' %').openPopup();
+    }
+
+    // Function to fetch data from the server and update marker description
+    function fetchDataAndUpdateMarker() {
+      fetch('/get_data')
+        .then(response => response.json())
+        .then(data => {
+          updateMarkerDescription(data.temp, data.hum);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    // Initial update
+    fetchDataAndUpdateMarker();
+
+    // Periodically update marker description
+    setInterval(fetchDataAndUpdateMarker, 5000); // Adjust the interval as needed
+  </script>
+</body>
+
+</html>
