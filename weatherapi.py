@@ -23,35 +23,50 @@ def fetch_weather_data(lat, lon):
 
 
 
+
 def calculate_temperature_difference(api_temp, device_temp):
     """
     Calculates the difference between API temperature and device temperature.
     """
-    return abs(api_temp - device_temp)
+    try:
+        api_temp = float(api_temp)
+        return abs(api_temp - device_temp)
+    except (ValueError, TypeError):
+        print("Error: Invalid temperature values")
+        return None
 
-def get_heatmap_data(device_id,duration_minutes=3):
+def get_heatmap_data(device_id):
     location = database.get_device_location(device_id)
     if not location:
+        print("Failed to get device location")
         return []
-    lat,lon = map(float, location.split(','))
-    # Get the average device temperature
-    end_time = datetime.now()
-    start_time = end_time - timedelta(minutes=duration_minutes)
-    device_data = database.get_device_sensor_data(device_id, start_time, end_time)
-    device_temps = [temp for temp, _ in device_data]
-    if not device_temps:
+    lat, lon = map(float, location.split(','))
+
+    # Get the last available data point
+    device_data = database.get_latest_sensor_data(device_id)
+    if not device_data:
+        print("No sensor data available for device", device_id)
         return []
-    avg_device_temp = sum(device_temps) / len(device_temps)
+    device_temp, _, _ = device_data
 
     # Get the current temperature from the WeatherAPI
-    api_temp = fetch_weather_data(lat, lon)
+    api_temp = fetch_weather_data(lat,lon)
     if api_temp is None:
+        print("Failed to fetch weather data")
         return []
 
     # Calculate the temperature difference
-    temp_diff = calculate_temperature_difference(avg_device_temp, api_temp)
+    temp_diff = calculate_temperature_difference(device_temp, api_temp)
+    if temp_diff is None:
+        print("Failed to calculate temperature difference for device", device_id)
+        return []
 
-    # Format for Leaflet heatmap: [lat, lon, intensity]
-    return [lat, lon, temp_diff]
+    print("success")
+    print(temp_diff)
+    
+    # Format for Leaflet heatmap: [[lat, lon, intensity]]
+    print([[lat,lon,temp_diff]])
+    print(f"Heatmap data for device {device_id}: {[lat, lon, temp_diff]}")  # Debugging statement
+    return [[lat, lon, temp_diff]]
 
 

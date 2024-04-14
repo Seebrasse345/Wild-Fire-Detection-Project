@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, render_template
-from mqtt_sensor_finder import SensorDataProcessor  # Corrected import statement
+from flask_cors import CORS
+from mqtt_sensor_finder import SensorDataProcessor
 import threading
 import database
 import paho
 import weatherapi
+
 app = Flask(__name__)
+CORS(app) 
 database.create_table()
 
 # Create an instance of the SensorDataProcessor
@@ -28,10 +31,7 @@ def index():
 def data():
     # Use the get_data method from the sensor_processor to fetch the latest sensor data
     temperature, humidity = sensor_processor.get_data()
-    # Ensure that the data is not None before sending
-    temperature = 10
-    humidity = 40
-    #These are just debug values for when im at home since no range to update them
+    print(f"Temperature: {temperature}, Humidity: {humidity}")  # Debugging statement
     if temperature is not None and humidity is not None:
         return jsonify({
             'temperature': temperature,
@@ -40,26 +40,29 @@ def data():
     else:
         # In case the data is None, send a message indicating that data is not available
         return jsonify({'message': 'Sensor data not available yet'}), 503
+
 @app.route('/device-data')
 def device_data():
-    all_devices_data = database.get_all_devices_data()  # Function to be created/modified in database.py
-    # Add logic to fetch the latest temperature and humidity for each device
+    all_devices_data = database.get_all_devices_data()
+    print(f"All devices data: {all_devices_data}")  # Debugging statement
     for device in all_devices_data:
-        latest_temp, latest_humidity = database.get_latest_sensor_data(device['sensor_name'])
-        device.update({'temperature': latest_temp, 'humidity': latest_humidity})
+        latest_temp, latest_humidity, latest_battery_voltage = database.get_latest_sensor_data(device['sensor_name'])
+        device.update({'temperature': latest_temp, 'humidity': latest_humidity, 'battery_voltage': latest_battery_voltage})
     return jsonify(all_devices_data)
 
 @app.route('/all-heatmap-data')
 def all_heatmap_data():
-    all_devices_data = database.get_all_devices_data()  # Function to be created in database.py
+    all_devices_data = database.get_all_devices_data()
     heatmap_data = []
 
     for device_data in all_devices_data:
         device_id, location = device_data['sensor_name'], device_data['location']
+        print(f"Processing heatmap data for device: {device_id}")  # Debugging statement
         
         device_heatmap_data = weatherapi.get_heatmap_data(device_id)
-        heatmap_data.append(device_heatmap_data)
+        heatmap_data.extend(device_heatmap_data)
 
+    print(f"Final heatmap data: {heatmap_data}")  # Debugging statement
     return jsonify(heatmap_data)
 
 if __name__ == '__main__':

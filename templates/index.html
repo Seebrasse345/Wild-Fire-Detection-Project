@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-    <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
@@ -20,77 +19,69 @@
 </head>
 
 <body>
-  <div id="map" style="height: 500px;"></div>
+    <div id="map" style="height: 500px;"></div>
 
-  <script>
-    var world_street_map = L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-    });
-
-    // Initialize the map
-    var map = L.map('map', {
-      layers: [world_street_map] // Default basemap
-    }).setView([53.381557878700825, -1.482525744182223], 15);
-
-      var markers = {};
-
-      function updateMarkers() {
-          fetch('http://localhost:3000/device-data')
-              .then(response => response.json())
-              .then(devices => {
-                  devices.forEach(device => {
-                      var latlng = device.location.split(',').map(Number);
-                      var popupContent = `Device: ${device.sensor_name}<br>Temperature: ${device.temperature} °C<br>Humidity: ${device.humidity} %`;
-
-                      if (markers[device.sensor_name]) {
-                          // Update existing marker
-                          markers[device.sensor_name].setLatLng(latlng).setPopupContent(popupContent);
-                      } else {
-                          // Create new marker
-                          markers[device.sensor_name] = L.marker(latlng).addTo(map).bindPopup(popupContent);
-                      }
-                  });
-              })
-              .catch(error => console.error('Error fetching device data:', error));
-      }
-
-      // Initial update and set interval to periodically update markers
- 
-
-
-
-
-      // Function to update heatmaps for all devices
-      function updateHeatmaps() {
-          fetch('http://localhost:3000/all-heatmap-data')
-              .then(response => response.json())
-              .then(allHeatmapData => {
-                  // Clear existing heatmaps
-                  map.eachLayer(function (layer) {
-                      if (!!layer._latlngs) { // Heatmap layer detected
-                          map.removeLayer(layer);
-                      }
-                  });
-
-                  // Add a new heatmap layer for each device
-                  allHeatmapData.forEach(deviceHeatmapData => {
-                      var heatLayer = L.heatLayer([deviceHeatmapData], { radius: 50 }).addTo(map);
-                  });
-              })
-              .catch(error => console.error('Error fetching heatmap data:', error));
-      }
-      updateMarkers();
-      setInterval(updateMarkers, 60000); // Update every 60 seconds
-      // Initial update and set interval to periodically update heatmaps
-      updateHeatmaps();
-      setInterval(updateHeatmaps, 60000); // Update every 60 seconds
-
-
-
-
-
-
-  </script>
+    <script>
+        var map = L.map('map').setView([53.381557878700825, -1.482525744182223], 15);
+    
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(map);
+    
+        var markers = {};
+        var heatmapLayer = L.heatLayer([], {
+            radius: 25,
+            blur: 15,
+            maxZoom: 18,
+            max: 1.0,
+            minOpacity: 0.5
+        }).addTo(map);
+    
+        function updateMarkers() {
+            fetch('http://localhost:3000/device-data')
+                .then(response => response.json())
+                .then(devices => {
+                    console.log('Received device data:', devices);
+    
+                    // Clear existing markers
+                    Object.values(markers).forEach(marker => map.removeLayer(marker));
+                    markers = {};
+                    
+                    devices.forEach(device => {
+                        var latlng = device.location.split(',').map(parseFloat);
+                    
+                        var popupContent = `
+                            <b>Device:</b> ${device.sensor_name}<br>
+                            <b>Temperature:</b> ${device.temperature} °C<br>
+                            <b>Humidity:</b> ${device.humidity} %
+                        `;
+    
+                        var marker = L.marker(latlng).addTo(map).bindPopup(popupContent);
+                        markers[device.sensor_name] = marker;
+                    });
+                })
+                .catch(error => console.error('Error fetching device data:', error));
+        }
+    
+        function updateHeatmap() {
+            fetch('http://localhost:3000/all-heatmap-data')
+                .then(response => response.json())
+                .then(heatmapData => {
+                    console.log('Received heatmap data:', heatmapData);
+                    heatmapLayer.setLatLngs(heatmapData);
+                })
+                .catch(error => console.error('Error fetching heatmap data:', error));
+        }
+    
+        // Initial update
+        updateMarkers();
+        updateHeatmap();
+    
+        // Periodic updates
+        setInterval(updateMarkers, 60000); // Update markers every 60 seconds
+        setInterval(updateHeatmap, 60000); // Update heatmap every 60 seconds
+    </script>
 </body>
 
 </html>

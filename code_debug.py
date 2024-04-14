@@ -1,7 +1,7 @@
 import json
 import database
 database.create_table()
-# Sample output (assuming this is a JSON string)
+
 sample_output = '''
 {
   "identifiers": [
