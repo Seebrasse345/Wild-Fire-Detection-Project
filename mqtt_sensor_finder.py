@@ -8,11 +8,8 @@ class SensorDataProcessor:
     def __init__(self):
         self.temp = None
         self.hum = None
-<<<<<<< Updated upstream
-=======
         self.battery_voltage = None  
         self.device_data = {} 
->>>>>>> Stashed changes
         self.lock = threading.Lock()  # To ensure thread safety
     def run_mqtt_client(self):
         client = mqtt.Client()
@@ -25,13 +22,10 @@ class SensorDataProcessor:
         # Start the network loop in a separate thread
         client.loop_start()
 
-<<<<<<< Updated upstream
     def process_data(self, payload_json):
-=======
 
         
     def process_data(self, payload_json, device_eui):
->>>>>>> Stashed changes
         # Make sure this is an uplink message
         if 'uplink_message' in payload_json:
             frm_payload_base64 = payload_json['uplink_message']['frm_payload']
@@ -48,15 +42,12 @@ class SensorDataProcessor:
             device_id = payload_json["identifiers"][0]["device_ids"]["device_id"]
 
             with self.lock:
-<<<<<<< Updated upstream
                 self.temp = temperature
                 self.hum = humidity
                 print(f"temp: {self.temp} *C")
                 print(f"humidity: {self.hum} %")
-=======
                 if device_eui not in self.device_data:
                     self.device_data[device_eui] = {}  # Initialize the device_data for the new device
->>>>>>> Stashed changes
 
                 self.device_data[device_eui]["temp"] = temperature
                 self.device_data[device_eui]["hum"] = humidity
@@ -68,12 +59,9 @@ class SensorDataProcessor:
                 print(f"Battery Voltage: {battery_voltage} V")
                 print(f"Processed data for device {device_eui}: Temperature: {temperature}, Humidity: {humidity}, Battery Voltage: {battery_voltage}")
                 # Update the database with new sensor data
-<<<<<<< Updated upstream
                 database.update_sensor_data(device_id, self.temp, self.hum)
 
-=======
                 database.update_sensor_data(device_eui, temperature, humidity, battery_voltage)
->>>>>>> Stashed changes
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         # Subscribe to the specific topic for uplink messages
@@ -82,16 +70,13 @@ class SensorDataProcessor:
     def on_message(self, client, userdata, msg):
         try:
             payload_json = json.loads(msg.payload.decode('utf-8'))
-<<<<<<< Updated upstream
             # Only process if it's an uplink message
             if 'uplink_message' in payload_json:
                 self.process_data(payload_json)
-=======
             print("Received payload:", payload_json)
             if 'end_device_ids' in payload_json and 'device_id' in payload_json['end_device_ids']:
                 device_eui = payload_json['end_device_ids']['device_id']
                 self.process_data(payload_json, device_eui)
->>>>>>> Stashed changes
         except Exception as e:
             print("Error decoding payload:", e)
 
