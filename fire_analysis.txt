@@ -1,0 +1,5 @@
+Fire Event Analysis Summary
+---------------------------
+Total Fire Events: 43181
+Total Non-Fire Events: 1121292
+Proportion of Fire Events: 3.71%

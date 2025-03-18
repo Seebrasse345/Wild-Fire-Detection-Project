@@ -1,44 +1,129 @@
-1.database.py
-This script handles the interaction with the SQLite database. It provides functions to:
+# Fire Detection System
 
-Connect to the database
-Create the sensor_readings table
-Update sensor data
-Retrieve device sensor data within a specified time range
-Get device location
-Fetch all devices' data
-Get the latest sensor data for a specific device
+A real-time fire detection system that uses IoT sensors to monitor temperature and humidity levels across multiple locations. The system includes a web interface with an interactive map showing sensor locations and temperature anomalies.
 
-2. weatherapi.py
-This script interacts with the WeatherAPI to fetch weather data for a given latitude and longitude. It also calculates the temperature difference between the API temperature and the device temperature. The script provides a function to get heatmap data for a specific device.
-3. mqtt_sensor_finder.py
-This script handles the MQTT communication with the sensors. It subscribes to the MQTT topic for uplink messages and processes the received data. The script decodes the temperature, humidity, and battery voltage from the payload and updates the database with the new sensor data.
-4. app.py
-This script is the main Flask application. It serves the webpage that displays the sensor data and provides API endpoints for retrieving sensor data, device data, and heatmap data. The script also starts the MQTT client in a separate thread when the Flask application starts.
-5. model_initial.py
-This script trains a Random Forest model using the VIIRS and NASA data stored in CSV files. It performs the following steps:
+## Features
 
-Loads and preprocesses the data
-Splits the data into training and testing sets
-Performs feature engineering
-Defines the hyperparameter grid for tuning
-Trains the Random Forest model using grid search cross-validation
-Evaluates the model on the test set
-Visualizes the hyperparameter tuning results
+- Real-time temperature and humidity monitoring
+- MQTT integration with The Things Network (TTN)
+- Interactive map interface with sensor locations
+- Heat map visualization of temperature anomalies
+- Battery voltage monitoring for sensors
+- Automatic data persistence using SQLite
+- Weather API integration for temperature comparison
+- Responsive web interface with real-time updates
 
-Usage
+## Prerequisites
 
-Set up the necessary environment variables and configurations in the scripts.
-Run app.py to start the Flask application.
-Access the webpage served by the Flask application to view the sensor data.
-The MQTT client will automatically start and process incoming sensor data.
-Run model_initial.py to train the Random Forest model using the VIIRS and NASA data.
-Dependencies
-The project requires the following dependencies:
+- Python 3.7+
+- The Things Network (TTN) account and application
+- WeatherAPI.com API key
+- Internet connection for MQTT and weather data
 
-Flask
-Flask-CORS
-pandas
-scikit-learn
-matplotlib
-paho-mqtt
+## Installation
+
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd [repository-name]
+```
+
+2. Install required Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up your environment:
+   - Update the TTN credentials in `mqtt_sensor_finder.py`
+   - Update the Weather API key in `weatherapi.py`
+
+## Configuration
+
+### MQTT Configuration
+In `mqtt_sensor_finder.py`, update the following variables with your TTN credentials:
+```python
+username = "your-ttn-application-id"
+password = "your-ttn-access-key"
+mqtt_broker = "your-region.cloud.thethings.network"
+```
+
+### Weather API Configuration
+In `weatherapi.py`, update the API key:
+```python
+WEATHER_API_KEY = "your-weather-api-key"
+```
+
+## Running the Application
+
+1. Start the Flask application:
+```bash
+python app.py
+```
+
+2. Access the web interface at `http://localhost:3000`
+
+## System Architecture
+
+### Components:
+1. **Flask Backend (`app.py`)**
+   - Serves the web interface
+   - Handles API endpoints for sensor data
+   - Manages MQTT client connection
+
+2. **MQTT Client (`mqtt_sensor_finder.py`)**
+   - Connects to TTN
+   - Processes incoming sensor data
+   - Decodes payload data
+
+3. **Database (`database.py`)**
+   - SQLite database for data persistence
+   - Stores sensor readings and locations
+   - Manages historical data
+
+4. **Weather Integration (`weatherapi.py`)**
+   - Fetches current weather data
+   - Calculates temperature anomalies
+   - Provides data for heatmap visualization
+
+5. **Web Interface (`templates/index.html`)**
+   - Interactive map using Leaflet.js
+   - Real-time sensor data display
+   - Heatmap visualization
+
+## API Endpoints
+
+- `/` - Main web interface
+- `/data` - Latest sensor readings
+- `/device-data` - All device information and latest readings
+- `/all-heatmap-data` - Temperature anomaly data for heatmap
+
+## Sensor Data Format
+
+The system expects sensor data in the following format:
+- Temperature: 2 bytes, big-endian, scaled by 10
+- Humidity: 1 byte, scaled by 2
+- Battery voltage: Included in payload
+
+## Troubleshooting
+
+1. **No sensor data appearing:**
+   - Check TTN credentials
+   - Verify MQTT connection
+   - Ensure sensors are transmitting
+
+2. **Heatmap not showing:**
+   - Verify Weather API key
+   - Check sensor locations are properly set
+   - Ensure temperature data is being received
+
+3. **Database issues:**
+   - Check file permissions for `sensor_data.db`
+   - Verify table schema using SQLite browser
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests.
+
+## License
+
+[Your chosen license]

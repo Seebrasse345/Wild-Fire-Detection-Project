@@ -1,0 +1,21 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the combined data
+df = pd.read_csv("data_combined.csv")
+
+# Filter for fire events only 
+df_fire_events = df[df['fire'] == 1]
+
+# Count fire events by day of the week
+day_of_week_fire_counts = df_fire_events.groupby('day_of_week')['fire'].count()
+
+# Create a bar plot
+plt.figure(figsize=(8, 5))
+day_of_week_fire_counts.plot.bar()
+plt.xlabel('Day of Week')
+plt.ylabel('Fire Event Count')
+plt.title('Distribution of Fire Events by Day of Week')
+plt.xticks(range(7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) # Customize labels
+plt.tight_layout()
+plt.show()

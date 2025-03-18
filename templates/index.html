@@ -6,26 +6,80 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>Fire Map</title>
+    <title>Fire Detection System</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/leaflet-heat.js"></script>
+    
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
         #map {
-            height: calc(100vh - 20px) !important;
+            height: 100vh;
+            width: 100%;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            max-width: 300px;
+        }
+        
+        .device-info {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .device-info:last-child {
+            border-bottom: none;
+        }
+        
+        .battery-indicator {
+            display: inline-block;
+            width: 50px;
+            height: 10px;
+            background: #ddd;
+            margin-left: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .battery-level {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s ease;
+        }
+        
+        .low-battery {
+            background: #f44336;
         }
     </style>
-    <script src="/static/js/leaflet-heat.js"></script>
 </head>
 
 <body>
-    <div id="map" style="height: 500px;"></div>
+    <div id="map"></div>
+    <div class="info-panel" id="deviceInfo">
+        <h3>Device Information</h3>
+        <div id="deviceList"></div>
+    </div>
 
     <script>
         var map = L.map('map').setView([53.381557878700825, -1.482525744182223], 15);
     
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 18,
         }).addTo(map);
     
@@ -38,11 +92,41 @@
             minOpacity: 0.5
         }).addTo(map);
     
+        function updateDeviceInfo(devices) {
+            const deviceList = document.getElementById('deviceList');
+            deviceList.innerHTML = '';
+            
+            devices.forEach(device => {
+                const deviceDiv = document.createElement('div');
+                deviceDiv.className = 'device-info';
+                
+                const batteryPercentage = (device.battery_voltage - 2.5) / (4.2 - 2.5) * 100;
+                const isLowBattery = batteryPercentage < 20;
+                
+                deviceDiv.innerHTML = `
+                    <strong>${device.sensor_name}</strong><br>
+                    Temperature: ${parseFloat(device.temperature).toFixed(1)}°C<br>
+                    Humidity: ${parseFloat(device.humidity).toFixed(1)}%<br>
+                    Battery: ${parseFloat(device.battery_voltage).toFixed(2)}V
+                    <div class="battery-indicator">
+                        <div class="battery-level ${isLowBattery ? 'low-battery' : ''}" 
+                             style="width: ${Math.min(Math.max(batteryPercentage, 0), 100)}%">
+                        </div>
+                    </div>
+                `;
+                
+                deviceList.appendChild(deviceDiv);
+            });
+        }
+    
         function updateMarkers() {
             fetch('http://localhost:3000/device-data')
                 .then(response => response.json())
                 .then(devices => {
                     console.log('Received device data:', devices);
+    
+                    // Update device info panel
+                    updateDeviceInfo(devices);
     
                     // Clear existing markers
                     Object.values(markers).forEach(marker => map.removeLayer(marker));
@@ -53,8 +137,9 @@
                     
                         var popupContent = `
                             <b>Device:</b> ${device.sensor_name}<br>
-                            <b>Temperature:</b> ${device.temperature} °C<br>
-                            <b>Humidity:</b> ${device.humidity} %
+                            <b>Temperature:</b> ${parseFloat(device.temperature).toFixed(1)} °C<br>
+                            <b>Humidity:</b> ${parseFloat(device.humidity).toFixed(1)} %<br>
+                            <b>Battery:</b> ${parseFloat(device.battery_voltage).toFixed(2)} V
                         `;
     
                         var marker = L.marker(latlng).addTo(map).bindPopup(popupContent);
@@ -79,8 +164,8 @@
         updateHeatmap();
     
         // Periodic updates
-        setInterval(updateMarkers, 60000); // Update markers every 60 seconds
-        setInterval(updateHeatmap, 60000); // Update heatmap every 60 seconds
+        setInterval(updateMarkers, 30000); // Update markers every 30 seconds
+        setInterval(updateHeatmap, 30000); // Update heatmap every 30 seconds
     </script>
 </body>
 

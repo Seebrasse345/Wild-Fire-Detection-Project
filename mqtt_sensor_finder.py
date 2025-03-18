@@ -22,46 +22,51 @@ class SensorDataProcessor:
         # Start the network loop in a separate thread
         client.loop_start()
 
-    def process_data(self, payload_json):
-
-        
     def process_data(self, payload_json, device_eui):
-        # Make sure this is an uplink message
-        if 'uplink_message' in payload_json:
-            frm_payload_base64 = payload_json['uplink_message']['frm_payload']
-            frm_payload_bytes = base64.b64decode(frm_payload_base64)
-        
-            # Decode temperature (2 bytes, big endian)
-            temperature_raw = frm_payload_bytes[2:4]
-            temperature = (temperature_raw[0] << 8 | temperature_raw[1]) / 10.0
-        
-            # Decode humidity (1 byte)
-            humidity_raw = frm_payload_bytes[6]
-            humidity = humidity_raw / 2.0
-        
-            device_id = payload_json["identifiers"][0]["device_ids"]["device_id"]
+        try:
+            # Make sure this is an uplink message
+            if 'uplink_message' in payload_json:
+                frm_payload_base64 = payload_json['uplink_message']['frm_payload']
+                frm_payload_bytes = base64.b64decode(frm_payload_base64)
+            
+                # Decode temperature (2 bytes, big endian)
+                temperature_raw = frm_payload_bytes[2:4]
+                temperature = (temperature_raw[0] << 8 | temperature_raw[1]) / 10.0
+            
+                # Decode humidity (1 byte)
+                humidity_raw = frm_payload_bytes[6]
+                humidity = humidity_raw / 2.0
 
-            with self.lock:
-                self.temp = temperature
-                self.hum = humidity
-                print(f"temp: {self.temp} *C")
-                print(f"humidity: {self.hum} %")
-                if device_eui not in self.device_data:
-                    self.device_data[device_eui] = {}  # Initialize the device_data for the new device
+                # Decode battery voltage (2 bytes)
+                battery_raw = frm_payload_bytes[4:6]
+                battery_voltage = (battery_raw[0] << 8 | battery_raw[1]) / 1000.0  # Convert to volts
+            
+                device_id = payload_json["end_device_ids"]["device_id"]
 
-                self.device_data[device_eui]["temp"] = temperature
-                self.device_data[device_eui]["hum"] = humidity
-                self.device_data[device_eui]["battery_voltage"] = battery_voltage
+                with self.lock:
+                    self.temp = temperature
+                    self.hum = humidity
+                    self.battery_voltage = battery_voltage
 
-                print(f"Device EUI: {device_eui}")
-                print(f"temp: {temperature} *C")
-                print(f"humidity: {humidity} %")
-                print(f"Battery Voltage: {battery_voltage} V")
-                print(f"Processed data for device {device_eui}: Temperature: {temperature}, Humidity: {humidity}, Battery Voltage: {battery_voltage}")
-                # Update the database with new sensor data
-                database.update_sensor_data(device_id, self.temp, self.hum)
+                    if device_eui not in self.device_data:
+                        self.device_data[device_eui] = {}
 
-                database.update_sensor_data(device_eui, temperature, humidity, battery_voltage)
+                    self.device_data[device_eui]["temp"] = temperature
+                    self.device_data[device_eui]["hum"] = humidity
+                    self.device_data[device_eui]["battery_voltage"] = battery_voltage
+
+                    print(f"Device EUI: {device_eui}")
+                    print(f"Temperature: {temperature:.1f} °C")
+                    print(f"Humidity: {humidity:.1f} %")
+                    print(f"Battery Voltage: {battery_voltage:.2f} V")
+
+                    # Update the database with new sensor data
+                    database.update_sensor_data(device_id, temperature, humidity, battery_voltage)
+
+        except Exception as e:
+            print(f"Error processing data: {e}")
+            print(f"Payload: {payload_json}")
+
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         # Subscribe to the specific topic for uplink messages
